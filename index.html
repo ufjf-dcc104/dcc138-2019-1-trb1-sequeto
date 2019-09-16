@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 04</title>
+    <script src="Sprite.js"></script>
+    <script src="Scene.js"></script>
+
+
+</head>
+
+<body>
+    <canvas />
+    <script>
+        var canvas = document.querySelector("canvas");
+        canvas.width = 600;
+        canvas.height = 300;
+        var ctx = canvas.getContext("2d");
+        var teclas = {
+            esquerda: 0,
+            cima: 0,
+            direita: 0,
+            baixo: 0,
+            espaco: 0
+        }
+        var tempoSpawn = 0;
+
+        var cena1 = new Scene({
+            ctx: ctx,
+            w: canvas.width,
+            h: canvas.height
+        });
+
+        var pc = new Sprite({
+            x: 50,
+            y: 150,
+            props:{tipo:"pc"},
+            comportar: porTeclasDirecionais(teclas)
+        });
+
+        var torre = new Sprite({
+            x: 0,
+            y: 0,
+            h: canvas.height,
+            w: 40,
+            color: "red",
+            props:{tipo:"torre"},
+        });
+
+        cena1.adicionar(pc);
+        cena1.adicionar(torre);
+
+        cena1.desenhar();
+
+        function persegue(alvo) {
+            return function () {
+                this.vx = 60 * Math.sign((alvo.x + alvo.w) - this.x);
+            }
+        }
+
+
+        // Passo
+        function passo(t) {
+            dt = (t - anterior) / 1000;
+            spawn(dt);
+            cena1.passo(dt);
+            anterior = t;
+            requestAnimationFrame(passo);
+        }
+
+        var dt, anterior = 0;
+        requestAnimationFrame(passo);
+
+
+        // Realiza Spawn Dos Inimigos
+        function spawn(dt) {
+            if (tempoSpawn > 0) {
+                tempoSpawn = tempoSpawn - dt;
+            }
+
+            if (tempoSpawn <= 0) {
+                cena1.adicionar(new Sprite({
+                    x: 600,
+                    y: Math.random()*(canvas.height-10),
+                    color: "green",
+                    comportar: persegue(torre),
+                    props:{tipo:"npc"}
+                }));
+                tempoSpawn = 2;
+            }
+        }
+
+
+        // Configurando controle por teclado
+        function porTeclasDirecionais(teclas) {
+            return function () {
+                if (teclas.cima) {
+                    this.vy = -100;
+                }
+                if (teclas.baixo) {
+                    this.vy = 100;
+                }
+
+                if (!teclas.cima && !teclas.baixo) {
+                    this.vy = 0;
+                }
+
+                if (teclas.espaco && this.atirando <= 0) {
+                    var tiro = new Sprite({
+                        x: pc.x,
+                        y: pc.y,
+                        w: 3,
+                        h: 3,
+                        vx: 200,
+                        props:{tipo:"tiro"},                        
+                        color: "gray",
+                    });
+                    this.scene.adicionar(tiro);
+                    this.atirando = 0.75;
+                }
+            }
+        }
+
+        // Escuta das teclas
+        addEventListener("keydown", function (e) {
+            switch (e.keyCode) {
+
+                case 32:
+                    teclas.espaco = 1;
+                    break;
+                case 38:
+                    teclas.cima = 1;
+                    break;
+                case 40:
+                    teclas.baixo = 1;
+                    break;
+
+                default:
+                    break;
+            }
+        });
+
+        addEventListener("keyup", function (e) {
+            switch (e.keyCode) {
+
+                case 32:
+                    teclas.espaco = 0;
+                    break;
+
+                case 38:
+                    teclas.cima = 0;
+                    break;
+
+                case 40:
+                    teclas.baixo = 0;
+                    break;
+
+                default:
+                    break;
+            }
+        });
+    </script>
+</body>
+
+</html>
