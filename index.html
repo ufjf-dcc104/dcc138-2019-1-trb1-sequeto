@@ -26,13 +26,16 @@
             espaco: 0
         }
         var tempoSpawn = 0;
+        var nemesis = 0;
 
+        // Cria Cena
         var cena1 = new Scene({
             ctx: ctx,
             w: canvas.width,
             h: canvas.height
         });
 
+        // Cria Personagem Principal
         var pc = new Sprite({
             x: 50,
             y: 150,
@@ -40,6 +43,7 @@
             comportar: porTeclasDirecionais(teclas)
         });
 
+        // Cria Torre
         var torre = new Sprite({
             x: 0,
             y: 0,
@@ -52,14 +56,20 @@
         cena1.adicionar(pc);
         cena1.adicionar(torre);
 
-        cena1.desenhar();
 
+        // função perserguir do npc
         function persegue(alvo) {
             return function () {
                 this.vx = 60 * Math.sign((alvo.x + alvo.w) - this.x);
             }
         }
 
+        // função perseguir do nemesis
+        function persegueNemesis(alvo) {
+            return function () {
+                this.vx = 35 * Math.sign((alvo.x + alvo.w) - this.x);
+            }
+        }
 
         // Passo
         function passo(t) {
@@ -89,6 +99,22 @@
                     props:{tipo:"npc"}
                 }));
                 tempoSpawn = 2;
+                nemesis++;
+
+                if(nemesis === 17) // Spawn do Nemesis
+                {
+                    cena1.adicionar(new Sprite({
+                        x: 600,
+                        y: Math.random()*(canvas.height-40),
+                        w: 30,
+                        h: 30,
+                        color: "green",
+                        comportar: persegueNemesis(torre),
+                        props:{tipo:"nemesis"}
+                    }));
+
+                    nemesis = 0;
+                }
             }
         }
 

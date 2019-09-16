@@ -5,7 +5,8 @@ function Scene(params) {
         ctx: null,
         w: 300,
         h: 300,
-        pontos: 0
+        pontos: 0,
+        contador: 0
     }
 
     Object.assign(this, exemplo, params);
@@ -73,6 +74,26 @@ Scene.prototype.checaColisao = function(){
     }  
 };
 
+Scene.prototype.checaColisaoNemesis = function(){
+    for(var i = 0; i<this.sprites.length; i++){
+        for(var j = i+1; j<this.sprites.length; j++){
+            if(this.sprites[i].colidiuCom(this.sprites[j])){
+                if(this.sprites[i].props.tipo === "nemesis" && this.sprites[j].props.tipo ==="tiro"){
+                    this.toRemove.push(this.sprites[j]);
+                    this.contador++;
+
+                    if(this.contador === 4){
+                        this.toRemove.push(this.sprites[i]);
+                        this.toRemove.push(this.sprites[j]);
+                        this.pontos++;
+                        this.contador = 0;
+                    }
+                }
+            }
+        }
+    }  
+};
+
 
 Scene.prototype.pontuacao = function () {
     for (var i = 0; i < this.sprites.length; i++) {
@@ -87,6 +108,7 @@ Scene.prototype.passo = function () {
     this.mover(dt);
     this.desenhar();
     this.checaColisao();
+    this.checaColisaoNemesis();
     this.pontuacao();
     this.removeSprites();
 }
