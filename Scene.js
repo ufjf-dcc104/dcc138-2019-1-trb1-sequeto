@@ -6,7 +6,8 @@ function Scene(params) {
         w: 300,
         h: 300,
         pontos: 0,
-        contador: 0
+        contador: 0,
+        fase:1
     }
 
     Object.assign(this, exemplo, params);
@@ -69,6 +70,14 @@ Scene.prototype.checaColisao = function(){
                     this.toRemove.push(this.sprites[j]);
                     this.pontos++;
                 }
+                
+                if(this.sprites[i].props.tipo === "torre" && this.sprites[j].props.tipo ==="npc"){
+                    this.fase = 0;
+                }
+
+                if(this.sprites[i].props.tipo === "torre" && this.sprites[j].props.tipo ==="nemesis"){
+                    this.fase = 0;
+                }
             }
         }
     }  
@@ -101,7 +110,24 @@ Scene.prototype.pontuacao = function () {
     }
 };
 
+Scene.prototype.gameOver = function () {
+    for (var i = 0; i < this.sprites.length; i++) {
+        this.sprites[i].gameOver(this.ctx);
+    }
+};
+
 Scene.prototype.passo = function () {
+    switch (this.fase) {
+        case 1:
+            this.passo1();
+            break;
+    
+        default:this.fim();
+            break;
+    }
+}
+
+Scene.prototype.passo1 = function () {
     this.limpar();
     this.desenhaCenario();
     this.comportar();
@@ -111,4 +137,13 @@ Scene.prototype.passo = function () {
     this.checaColisaoNemesis();
     this.pontuacao();
     this.removeSprites();
+}
+
+Scene.prototype.fim = function () {
+    this.limpar();
+    this.desenhaCenario();
+    this.desenhar();
+    this.gameOver();
+    this.pontuacao();
+    
 }

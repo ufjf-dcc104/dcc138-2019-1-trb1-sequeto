@@ -51,7 +51,7 @@ Sprite.prototype.colidiuCom = function (alvo) {
         return false;
     if (alvo.y + alvo.w < this.y)
         return false;
-    if (alvo.y > this.y + this.w)
+    if (alvo.y > this.y + this.h)
         return false;
 
     return true;
@@ -63,4 +63,12 @@ Sprite.prototype.pontuacao = function (pontos, ctx) {
     ctx.font = "19px bold monospaced";
     ctx.fillText(pontos, 10, 290);
     ctx.strokeText(pontos, 10, 290);
+}
+
+Sprite.prototype.gameOver = function (ctx) {
+    ctx.fillStyle = "red";
+    ctx.strokeStyle = "red";
+    ctx.font = "35px bold monospaced";
+    ctx.fillText("Game Over", 300, 150);
+    ctx.strokeText("Game Over", 300, 150);
 }
